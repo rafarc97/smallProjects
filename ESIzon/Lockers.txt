@@ -1,0 +1,5 @@
+1/Barbate/Cadiz/local 12/1/0
+2/Puerto Real/Cadiz/local 12/2/0
+3/Barbate/Cadiz/local 12/1/0
+4/Puerto Real/Cadiz/local 12/1/0
+5/banana/barriles/local 12/1/0

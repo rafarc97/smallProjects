@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ESIzon" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/ESIzon" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/ESIzon" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="DatosUsuarios.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="DatosUsuarios.h" />
+		<Unit filename="Descuentos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Descuentos.h" />
+		<Unit filename="Devoluciones.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Devoluciones.h" />
+		<Unit filename="Logistica.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Logistica.h" />
+		<Unit filename="Menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Menu.h" />
+		<Unit filename="Pedidos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Pedidos.h" />
+		<Unit filename="Productos_Categorias.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Productos_Categorias.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

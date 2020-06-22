@@ -1,0 +1,3 @@
+1/Juan/Pérez/Plaza Juan de Austria 1 11100/Puerto Real/Cádiz/juanperez@gmail.com/psw1234/1000.00
+2/Pedro/López/Calle Plocia 2 11100/Barbate/Cadiz/pedrolopez@gmail.com/psw4321/500.00
+2/Juan/López/Calle caoba 3/Cadiz/Cadiz/uca@gmail.com/psw4321/500.00

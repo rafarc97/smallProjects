@@ -1,0 +1,79 @@
+# depslib dependency file v1.0
+1588157694 source:c:\users\alear\desktop\esizon\esizon\main.c
+	"Productos_Categorias.h"
+	"DatosUsuarios.h"
+	"Menu.h"
+
+1588160441 source:c:\users\alear\desktop\esizon\esizon\datosusuarios.c
+	"DatosUsuarios.h"
+
+1587924745 c:\users\alear\desktop\esizon\esizon\datosusuarios.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<math.h>
+	"Menu.h"
+
+1588167070 source:c:\users\alear\desktop\esizon\esizon\descuentos.c
+	"Descuentos.h"
+
+1588159360 c:\users\alear\desktop\esizon\esizon\descuentos.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<math.h>
+	"Menu.h"
+
+1588165134 source:c:\users\alear\desktop\esizon\esizon\devoluciones.c
+	"Devoluciones.h"
+
+1588158346 c:\users\alear\desktop\esizon\esizon\devoluciones.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	"Menu.h"
+
+1588166022 source:c:\users\alear\desktop\esizon\esizon\pedidos.c
+	"Pedidos.h"
+
+1588165984 c:\users\alear\desktop\esizon\esizon\pedidos.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	"Menu.h"
+
+1588131044 source:c:\users\alear\desktop\esizon\esizon\productos_categorias.c
+	"Productos_Categorias.h"
+
+1588010417 c:\users\alear\desktop\esizon\esizon\productos_categorias.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<math.h>
+	"Menu.h"
+
+1588165984 source:c:\users\alear\desktop\esizon\esizon\menu.c
+	"Menu.h"
+
+1588159321 c:\users\alear\desktop\esizon\esizon\menu.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<math.h>
+	<windows.h>
+
+1588167070 source:c:\users\alear\desktop\esizon\esizon\logistica.c
+	"Logistica.h"
+
+1588159684 c:\users\alear\desktop\esizon\esizon\logistica.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<math.h>
+	<time.h>
+	"Menu.h"
+

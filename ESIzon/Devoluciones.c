@@ -1,0 +1,888 @@
+
+#include "Devoluciones.h"
+
+void cargar_devoluciones(devoluciones **dev)
+{
+
+    char linea[200];
+    char *token;
+    FILE *f;
+
+    ndevoluciones=0;
+
+
+    f=fopen("Devoluciones.txt","a+");
+
+    if(f==NULL)
+    {
+        puts("Error de apertura");
+    }
+    else
+    {
+        rewind(f);
+        *dev=malloc(1*sizeof(devoluciones));
+
+        while(fgets(linea,200,f)!=NULL)
+        {
+            *dev=(devoluciones*)realloc((*dev),(ndevoluciones+1)*sizeof(devoluciones));
+
+            if((*dev)==NULL)
+            {
+                puts("No hay memoria suficiente");
+            }
+            else
+            {
+                token=strtok(linea,"/");
+                (*dev)[ndevoluciones].id_pedido=atoi(token);
+
+                token=strtok(NULL,"/");
+                (*dev)[ndevoluciones].id_prod=atoi(token);
+
+                token=strtok(NULL,"/");
+                strcpy((*dev)[ndevoluciones].fech_dev,token);
+
+                // (*dev)[ndevoluciones].fech_dev=atoi(token);
+                token=strtok(NULL,"/");//leer entre barras del fichero y lo guarda en la variable token.
+                strcpy((*dev)[ndevoluciones].motivo,token);
+
+                token=strtok(NULL,"/");
+                strcpy((*dev)[ndevoluciones].estado,token);
+
+
+                token=strtok(NULL,"/");
+                strcpy((*dev)[ndevoluciones].fech_acep,token);
+
+                // (*dev)[ndevoluciones].fech_acep=atoi(token);
+                token=strtok(NULL,"\n");
+                strcpy((*dev)[ndevoluciones].fech_cad,token);
+
+                ndevoluciones++;
+            }
+        }
+        fclose(f);
+    }
+}
+
+void guardar_devoluciones(devoluciones **dev)
+{
+    FILE *f;
+    int i;
+    f=fopen("Devoluciones.txt","w+");
+    for(i=0; i<ndevoluciones; i++)
+    {
+        fprintf(f,"%i/%i/%s/%s/%s/%s/%s\n",(*dev)[i].id_pedido,(*dev)[i].id_prod,(*dev)[i].fech_dev,(*dev)[i].motivo,(*dev)[i].estado,(*dev)[i].fech_acep,(*dev)[i].fech_cad);
+    }
+    fclose(f);
+
+}
+
+void dev_listar(devoluciones **dev, pedidos **pe)
+{
+//buscar un cliente --> miramos las ID_pedidos
+//vemos si coinciden con algun ID_pedido almacenado en devoluciones
+//finalmente, si esas devoluciones estan pendientes por aceptar, las imprimimos por pantalla.
+
+
+
+    //(LEER) cuando se vaya implementar tener cuidado de cambiar cliente=1 por justamente la linea que esta debajo --> cliente=(*usu)->id;
+    // En caso de que no funcionase asi, simplemente se debera asignar a cliente el ID_cliente del cliente que este usando el sistema: "cliente= ID_cliente del sistema"
+    int aux_cliente=1,sumador=1,i,j,p1,clave,fatdoor=0;
+    int *vec;
+    do
+    {
+
+        system("cls");
+
+        printf("\n|DEVOLUCIONES ESIZON|\n");
+
+        printf("\nIntroduzca el ID del cliente:  ");
+        fflush(stdin);
+        scanf("%i",&aux_cliente);
+
+
+        p1=dev_existe_cliente(pe,aux_cliente);
+
+    }
+    while((aux_cliente<=0 || aux_cliente>nt_pedidos-1) && p1==-1);
+    //cliente=(*usu)->id; //el id del usuario que esta utilizando esta funcion.
+    p1=dev_existe_cliente(pe,aux_cliente) ;
+
+    vec=p1;
+
+    printf("\n--------------------------------------------");
+    if(vec[0]!=-1) // me sirve pora comprobar si ese cliente ha hecho algun pedido.
+    {
+        for (i=1; i<=vec[0]; i++) //recorremos pedidos (i)
+        {
+            j=dev_existe_devolucion(dev,vec[i]);
+            if(j!=-1)
+            {
+
+                if( (strcmp((*dev)[j].estado,"pendiente")) ==0  ) //si el estado es pendiente, se procede
+                {
+                    printf("\n%i.- ID_pedido: %i   Estado: %s",sumador,(*dev)[j].id_pedido,(*dev)[j].estado);
+                    puerta_listar=0;
+                    sumador++;
+                    fatdoor=1;
+                }
+                else
+                {
+                    if( (strcmp((*dev)[j].estado,"enviado"))==0  ) //si el estado es enviado, se procede
+                    {
+                        printf("\n%i.- ID_pedido: %i   Estado: %s",sumador,(*dev)[j].id_pedido,(*dev)[j].estado);
+                        puerta_listar=0;
+                        sumador++;
+                        fatdoor=1;
+                    }
+                }
+            }
+        }
+        if(fatdoor == 0)
+        {
+            printf("\nEl cliente %i no no tiene ninguna devolucion en Esizon por aceptar/recibir.",aux_cliente);
+            puerta_listar=1;
+        }
+    }
+    else
+    {
+        printf("\nEl cliente %i no ha realizado ningun pedido en Esizon.",aux_cliente);
+        puerta_listar=1;
+    }
+    printf("\n--------------------------------------------");
+
+}
+
+int dev_existe_cliente(pedidos **pe,int aux_cliente)
+{
+    //meto en un vector las posiciones de la estructura en el cual se encuentra el cliente.
+    int c = 1;
+    int i;
+    int pos[1000];
+    pos[0] = -1;
+    for( i= 0; i < nt_pedidos; i++)
+    {
+        if(aux_cliente==(*pe)[i].id_cliente)
+        {
+            pos[c] = i;
+            c++;
+        }
+    }
+    if(c != 1)
+    {
+        pos[0] = c - 1;
+    }
+    c = pos;
+    return c;
+}
+
+void dev_modificar(devoluciones **dev, pedidos **pe)
+{
+    puerta_listar=0;
+    int op,puerta1=0,puerta2=0,pos,aux,repetir=0;
+    char auxm[2],auxyear[4];
+
+    int dia,mes,year,num;
+    time_t t;
+    struct tm *tm;
+    char fechayhora[100];
+
+
+
+
+
+
+    dev_listar(dev,pe); //se lista por primera vez
+
+    if(puerta_listar==0) //si no se puede modificar nada,no entra en el if //Puerta_listar esta en la funcion dev_listar
+    {
+        do
+        {
+            if(repetir==1) //si el usuario ha solicitado modificar de nuevo
+            {
+                system("cls"); //se limpia la consola
+                dev_listar(dev,pe); // se lista de nuevo, comprobando si hay algo que se pueda modificar
+            }
+
+            if(puerta_listar==0)
+            {
+                do
+                {
+                    do
+                    {
+                        printf("\n(DEVOLUCIONES) Introduce el ID_pedido que quieres modificar: ");
+                        //fflush(stdin);
+                        scanf("%i",&op);
+                    }
+                    while(op>ndevoluciones && op<=0);
+
+                    puerta1= dev_pendiente(dev,pe,op);// comprobamos que se haya introducido un ID_pedido con estado "pendiente".
+                    puerta2= dev_enviado(dev,pe,op); // comprobamos que se haya introducido un ID_pedido con estado "enviado".
+                    pos= dev_pendiente_recibido_posicion(dev,pe,op); //recuperamos la posicion de ese id_pedido en la estructura devoluciones.
+
+                    if(puerta1 != 1 && puerta2 !=1 )
+                        printf("\nIntroduce un ID correcta porfavor");
+                }
+                while ((puerta1==0 || puerta2==0) && (op>ndevoluciones && op<=0));
+
+
+                if (puerta1==1 )//LA DEVOLUCION SE ENCUENTRA EN ESTADO PENDIENTE
+                {
+                    printf("\nQue estado desea asignarle a esta devolucion:\n1.- ACEPTADO\n2.- DENEGADO\nElija una opcion: ");
+                    fflush(stdin);
+                    scanf("%i",&aux);
+
+                    switch(aux)
+                    {
+                    case 1:
+                        strcpy((*dev)[pos].estado,"aceptado");
+                        t=time(NULL);
+                        tm=localtime(&t);
+                        strftime(fechayhora, 100, "%d%m%Y", tm);
+                        strcpy((*dev)[pos].fech_acep,fechayhora);
+
+                        auxm[0]=(*dev)[pos].fech_acep[2];
+                        auxm[1]=(*dev)[pos].fech_acep[3];
+
+                        auxyear[0]=(*dev)[pos].fech_acep[4];
+                        auxyear[1]=(*dev)[pos].fech_acep[5];
+                        auxyear[2]=(*dev)[pos].fech_acep[6];
+                        auxyear[3]=(*dev)[pos].fech_acep[7];
+
+                        mes = atoi(auxm);
+                        year = atoi(auxyear);
+
+                        if(mes==12)
+                        {
+                            mes=1;
+                            year = year + 1;
+                            fechayhora[2]= '0';
+                            fechayhora[3]= '1';
+
+                            fechayhora[4]= auxyear[0];
+                            fechayhora[5]= auxyear[1];
+                            fechayhora[6]= auxyear[2];
+                            fechayhora[7]= auxyear[3] + 1;
+                        }
+                        else
+                        {
+                            if(mes==9)
+                            {
+                                fechayhora[2]= '1';
+                                fechayhora[3]= '0';
+                            }
+                            else
+                            {
+                                fechayhora[2]= '0';
+                                fechayhora[3]= auxm[1] + 1;
+                            }
+
+                        }
+                        strcpy((*dev)[pos].fech_cad,fechayhora);
+                        //	printf("%s",(*dev)[pos].fech_cad);
+                        break;
+
+                    case 2:
+                        strcpy((*dev)[pos].estado,"denegado");
+                        break;
+                    }
+
+                }
+                else
+                {
+                    if (puerta2==1)//LA DEVOLUCION SE ENCUENTRA EN ESTADO ENVIADO
+                    {
+                        printf("\nSe ha recibido la devolucion de este pedido:\n1.- SI\n2.- NO\nElija una opcion:");
+                        //fflush(stdin);
+                        scanf("%i",&aux);
+
+                        switch(aux)
+                        {
+                        case 1:
+                            strcpy((*dev)[pos].estado,"recibido");
+                            break;
+                        case 2:
+                            printf("\nCuando se reciba el pedido, acceda de nuevo a este menu para actualizar el estado de la devolucion a recibido.");
+                            break;
+                        default:
+                            printf("\nCuando se reciba el pedido, acceda de nuevo a este menu para actualizar el estado de la devolucion a recibido.");
+                            break;
+                        }
+                    }
+                }
+
+                printf("\n\nDesea modificar alguna otra devolucion:\n1.- SI\n2.- NO\nElija una opcion: ");
+                //fflush(stdin);
+                scanf("%i",&repetir);
+                //  }
+            }
+            else
+            {
+                repetir=0;
+            }
+            guardar_devoluciones(dev);
+        }
+        while(repetir==1);
+    }
+    return;
+
+}
+
+int dev_pendiente(devoluciones **dev,pedidos **pe,int id_aux_pedido)
+{
+    int j,exito=0;
+    for (j=0; j<ndevoluciones; j++)
+    {
+        if(id_aux_pedido==(*dev)[j].id_pedido) //si el ID_pedido pasado como parametro, coincide con el id de un pedido guardado en devoluciones
+        {
+            if( (strcmp((*dev)[j].estado,"pendiente"))==0 )// si el estado es pendiente, se procede
+            {
+                exito=1;
+            }
+            else
+            {
+                exito=0;
+            }
+        }
+    }
+    return exito;
+}
+
+int dev_enviado(devoluciones **dev, pedidos **pe,int id_aux_pedido) // cambio en el segundo if (he quitado else exito=0;)
+{
+    int j,exito=0;
+    for (j=0; j<ndevoluciones ; j++)
+    {
+        if(id_aux_pedido==(*dev)[j].id_pedido) //si el ID_pedido pasado como parametro, coincide con el id de un pedido guardado en devoluciones
+        {
+            if( (strcmp((*dev)[j].estado,"enviado"))==0)// si el estado es recibido, se procede
+            {
+                exito=1;
+            }
+        }
+    }
+    return exito;
+}
+
+int dev_pendiente_recibido_posicion(devoluciones **dev,pedidos **pe,int id_aux_pedido)
+{
+    int j,exito=0,pos;
+    for (j=0; j<ndevoluciones || exito==0 ; j++)
+    {
+        if(id_aux_pedido==(*dev)[j].id_pedido) //si el ID_pedido pasado como parametro, coincide con el id de un pedido guardado en devoluciones
+        {
+            if( (strcmp((*dev)[j].estado,"pendiente"))==0 || exito==0 )// si el estado es pendiente, se procede
+            {
+                exito=1;
+                pos=j;
+            }
+            else
+            {
+                if( (strcmp((*dev)[j].estado,"recibido"))==0 || exito==0 )// si el estado es recibido, se procede
+                {
+                    exito=1;
+                    pos=j;
+                }
+            }
+        }
+    }
+    return pos;
+}
+
+
+void dev_alta_cliente(devoluciones **dev,pedidos **pe,prod_pedidos **ppe,usuario **usu,cliente **c) // a la hora de implementar: (leer linea 534 )
+{
+
+    //CONDICION1: Mirar si ese pedido existe en devoluciones antes de crear una nueva.
+    int aux_pedido,pos,op;
+    int i,j,exit=0;
+
+    time_t t;
+    struct tm *tm;
+    char fechayhora[9];
+
+    ndevoluciones++;
+    *dev=(devoluciones*)realloc((*dev),(ndevoluciones+1)*sizeof(devoluciones));
+//ID PEDIDO
+
+    //(LEER) cuando se vaya implementar tener cuidado de cambiar cliente=1 por justamente la linea que esta debajo --> cliente=(*usu)->id;
+    // En caso de que no funcionase asi, simplemente se debera asignar a cliente el ID_cliente del cliente que este usando el sistema: "cliente= ID_cliente del sistema"
+    //cliente=(*usu)->id; //el id del usuario que esta utilizando esta funcion.
+    system("cls");									//FALLO: si se mete un numero dentro del rango (1,nt_pedidos) y no es alguna ID_pedido de ese usuario se bloquea el sistema.
+    listar_pedidos_cliente(pe,(*usu)->id);
+    printf("\nIntroduzca el ID Pedido que desea devolver: ");
+    scanf("%i",&aux_pedido);
+
+    //recordemos: un id_pedido es unico, por lo tanto solo lo puede tener un cliente.
+    //buscaremos ese pedido en las estructuras pedidos, cuando demos con el, verficaremos si ese pedido pertenece al cliente
+//-----------------------------------------------------------------
+//verificamos que el pedido sea del cliente. (estamos en la misma estructura)
+
+    for(i=0; i<nt_pedidos ; i++)
+    {
+        if(aux_pedido==(*pe)[i].id_pedido)
+        {
+            if((*usu)->id==(*pe)[i].id_cliente)
+            {
+                pos=i; // en esta pos guardamos la posicion en las estructuras del cliente.
+                exit=1;
+            }
+        }
+    }
+
+//-----------------------------------------------------------------
+//si existe alguna devolucion con el id_pedido introducido por el usuario
+    for(i=0; i<ndevoluciones ; i++)
+    {
+        if( aux_pedido == (*dev)[i].id_pedido )
+        {
+            exit=0;
+        }
+    }
+
+//-----------------------------------------------------------------
+//si exit=1 se para de preguntar el id_pedido y se guarda el dato
+// si exit==0 se repite
+
+
+
+    if (aux_pedido>0 && aux_pedido<=nt_pedidos && exit==1)
+    {
+
+        (*dev)[ndevoluciones-1].id_pedido = (*pe)[pos].id_pedido;
+
+
+        //A partir de este momento, ya solo es buscar en estructuras y meter datos, porque no hay nada que verificar.
+
+//ID PRODUCTO
+        //como ya tenemos el id_pedido guardado, debermos buscar en prod_pedidos el id_producto.
+
+        for(i=0; i<nt_prodpedidos; i++)
+        {
+            if(aux_pedido==(*ppe)[i].id_pedido)
+            {
+                (*dev)[ndevoluciones-1].id_prod = (*ppe)[i].id_prod;
+            }
+        }
+
+
+
+//FECHA DE DEVOLUCION
+        t=time(NULL);
+        tm=localtime(&t);
+        strftime(fechayhora, 9, "%d%m%Y", tm);
+        strcpy((*dev)[ndevoluciones-1].fech_dev,fechayhora);
+
+//MOTIVO
+        printf("\nIntroduzca el motivo de su devolucion: \n");
+        fflush(stdin);
+        gets((*dev)[ndevoluciones-1].motivo);
+
+//ESTADO
+        strcpy((*dev)[ndevoluciones-1].estado,"pendiente");
+
+//FECHA ACEPTACION
+        strcpy((*dev)[ndevoluciones-1].fech_acep,"00000000");
+
+//FECHA CADUCIDAD
+        strcpy((*dev)[ndevoluciones-1].fech_cad,"00000000");
+
+        printf("\nSu devolucion ha sido registrada.\nPara ver el progreso de esta, informese en el menu de seguimiento.");
+
+        guardar_devoluciones(dev);
+    }
+    else
+    {
+        do
+        {
+            printf("\nLa ID Pedido introducida no es valida.");
+            printf("\n1.- Reintentar\n2.- Cerrar\nElija una opcion: ");
+            fflush(stdin);
+            scanf("%i", &op);
+            system("cls");
+        }
+        while(0>op|| op>2);
+        if(op == 1)
+        {
+            dev_alta_cliente(dev,pe,ppe,usu,c);
+        }
+    }
+
+}
+
+void dev_alta_admin(devoluciones **dev,pedidos **pe,prod_pedidos **ppe,usuario **usu,cliente **c)
+{
+    //Un admin devuelve un pedido de un cliente
+    int aux_pedido,pos,cliente,op;
+    int i,j,exit=0,salida=0;
+    puerta_alta=1;
+    time_t t;
+    struct tm *tm;
+    char fechayhora[9];
+
+    ndevoluciones++;
+    *dev=(devoluciones*)realloc((*dev),(ndevoluciones+1)*sizeof(devoluciones));
+
+//ID PEDIDO
+
+    system("cls");
+    printf("\nIntroduce el ID Cliente: ");
+    scanf("%i",&cliente);
+
+    for(i=0; i<nt_pedidos; i++) //comprobamos que el cliente este en pedidos.
+    {
+        if(cliente==(*pe)[i].id_pedido)
+        {
+            //si el cliente introducido coincide con alguno de los existentes salida = 1.
+            salida = 1;
+        }
+    }
+    //cliente=(*usu)->id; //el id del usuario que esta utilizando esta funcion.
+    if(salida==1)
+    {
+        listar_pedidos_cliente(pe,ppe,cliente);
+        printf("\nIntroduzca el ID Pedido que desea devolver: ");
+        scanf("%i",&aux_pedido);
+
+
+        //recordemos: un id_pedido es unico, por lo tanto solo lo puede tener un cliente.
+        //buscaremos ese pedido en las estructuras pedidos, cuando demos con el, verficaremos si ese pedido pertenece al cliente
+//-----------------------------------------------------------------
+//verificamos que el pedido sea del cliente. (estamos en la misma estructura)
+
+        for(i=0; i<nt_pedidos ; i++)
+        {
+            if(aux_pedido==(*pe)[i].id_pedido)
+            {
+                if(cliente==(*pe)[i].id_cliente)
+                {
+                    pos=i; // en esta pos guardamos la posicion en las estructuras del cliente.
+                    exit=1;
+                }
+            }
+        }
+
+//-----------------------------------------------------------------
+//si existe alguna devolucion con el id_pedido introducido por el usuario
+        for(i=0; i<ndevoluciones ; i++)
+        {
+            if( aux_pedido == (*dev)[i].id_pedido )
+            {
+                exit=0;
+            }
+        }
+
+//-----------------------------------------------------------------
+//si exit=1 se para de preguntar el id_pedido y se guarda el dato
+// si exit==0 se repite
+
+    }
+
+    if (aux_pedido>0 && aux_pedido<=(nt_pedidos) && exit==1 && salida==1)
+    {
+
+        (*dev)[ndevoluciones-1].id_pedido = (*pe)[pos].id_pedido;
+
+
+        //A partir de este momento, ya solo es buscar en estructuras y meter datos, porque no hay nada que verificar.
+
+//ID PRODUCTO
+        //como ya tenemos el id_pedido guardado, debermos buscar en prod_pedidos el id_producto.
+
+        for(i=0; i<nt_prodpedidos; i++)
+        {
+            if(aux_pedido==(*ppe)[i].id_pedido)
+            {
+                (*dev)[ndevoluciones-1].id_prod = (*ppe)[i].id_prod;
+            }
+        }
+
+
+
+//FECHA DE DEVOLUCION
+        t=time(NULL);
+        tm=localtime(&t);
+        strftime(fechayhora, 9, "%d%m%Y", tm);
+        strcpy((*dev)[ndevoluciones-1].fech_dev,fechayhora);
+
+//MOTIVO
+        printf("\nIntroduzca el motivo de su devolucion: \n");
+        fflush(stdin);
+        gets((*dev)[ndevoluciones-1].motivo);
+
+//ESTADO
+        strcpy((*dev)[ndevoluciones-1].estado,"pendiente");
+
+//FECHA ACEPTACION
+        strcpy((*dev)[ndevoluciones-1].fech_acep,"00000000");
+
+//FECHA CADUCIDAD
+        strcpy((*dev)[ndevoluciones-1].fech_cad,"00000000");
+
+        printf("\nSu devolucion ha sido registrada.\nPara ver el progreso de esta, informese en el menu de seguimiento.");
+
+        guardar_devoluciones(dev);
+    }
+    else
+    {
+        do
+        {
+            printf("\nLa ID Cliente/Pedido introducida no es valida.");
+            printf("\n1.- Reintentar\n2.- Cerrar\nElija una opcion: ");
+            fflush(stdin);
+            scanf("%i", &op);
+            system("cls");
+        }
+        while(0>op|| op>2);
+        if(op == 1)
+        {
+            dev_alta_admin(dev,pe,ppe,usu,c);
+        }
+    }
+
+}
+
+void dev_baja_admin(devoluciones **dev,pedidos **pe,prod_pedidos **ppe,usuario **usu,cliente **c)
+{
+
+
+    int aux_pedido,pos,op;
+    int i=0;
+    devoluciones aux;
+    printf("\n|DAR BAJA DEVOLUCIONES|");
+    printf("\nIntroduce el [ID Pedido] correspondiente a la devolucion: ");
+    scanf("%i", &aux_pedido);
+
+    pos=dev_existe_devolucion(dev,aux_pedido);
+
+    if(pos==-1)
+    {
+        system("cls");
+        printf("Este ID no esta registrado como devolucion\n");
+        do
+        {
+            printf("1.- Reintentar\n2.- Cerrar\nElija una opcion: ");
+            fflush(stdin);
+            scanf("%i", &op);
+            system("cls");
+        }
+        while(0>op|| op>2);
+        if(op == 1)
+        {
+            system("cls");
+            dev_baja_admin(dev,pe,ppe,usu,c);
+        }
+    }
+    else
+    {
+
+
+        do
+        {
+            if ( aux_pedido == (*dev)[ndevoluciones-1].id_pedido )
+            {
+                ndevoluciones--;
+            }
+            else
+            {
+
+                if (    aux_pedido == (*dev)[i].id_pedido    )
+                {
+                    (*dev)[i].id_pedido=(*dev)[ndevoluciones-1].id_pedido;  //intercambio con la posicion que vamos a eliminar y la ult.
+                    (*dev)[i].id_pedido=(*dev)[ndevoluciones-1].id_prod;
+                    strcpy((*dev)[i].fech_dev,(*dev)[ndevoluciones-1].fech_dev);
+                    strcpy((*dev)[i].motivo,(*dev)[ndevoluciones-1].motivo);
+                    strcpy((*dev)[i].estado,(*dev)[ndevoluciones-1].estado);
+                    strcpy((*dev)[i].fech_acep,(*dev)[ndevoluciones-1].fech_acep);
+                    strcpy((*dev)[i].fech_cad,(*dev)[ndevoluciones-1].fech_cad);
+
+                    ndevoluciones--; //borramos el ultimo objeto guardado mochila tras el intercambio.
+                }
+                else
+                {
+                    i++;
+                }
+            }
+        }
+        while(i<ndevoluciones);
+        //una vez salga del bucle guardamos los cambios realizados
+
+
+
+        guardar_devoluciones(dev);
+        printf("\nDevolucion dada de baja con exito.");
+
+        /*
+        (*dev)[ndevoluciones].id_pedido =  (*dev)[pos].id_pedido;
+         (*dev)[ndevoluciones].id_prod =  (*dev)[pos].id_prod;
+         strcpy((*dev)[ndevoluciones].fech_dev,(*dev)[pos].fech_dev);
+         strcpy((*dev)[ndevoluciones].motivo,(*dev)[pos].motivo);
+         strcpy((*dev)[ndevoluciones].estado,(*dev)[pos].estado);
+         strcpy((*dev)[ndevoluciones].fech_acep,(*dev)[pos].fech_acep);
+         strcpy((*dev)[ndevoluciones].fech_cad,(*dev)[pos].fech_cad);
+        */
+    }
+
+    return;
+}
+
+int dev_existe_devolucion(devoluciones **dev,int devol)
+{
+    int i,pos=-1;
+    //printf("DEVOL= %i",devol);
+    //devol++;
+    for(i=0; i<ndevoluciones ; i++)
+    {
+        if(devol==(*dev)[i].id_pedido)
+        {
+            pos=i; // en esta pos guardamos la posicion en la estructura del id_pedido de devoluciones
+        }
+    }
+    return pos;
+    //si pos!=-1 esa devolucion existe
+    //si pos==-1 esa devolucion no existe
+}
+
+void dev_seguimiento(devoluciones **dev,pedidos **pe,usuario **usu,cliente **c) //error en el printf
+{
+    //Esta funcion solo es para clientes.
+    //Una vez se llame a esta funcion, el cliente que este en el sistema visualizara una lista de sus devoluciones
+    //Lo que se va a hacer es listar los pedidos devueltos de ese cliente(ID_pedido y Estado)
+
+    //(LEER) cuando se vaya implementar tener cuidado de cambiar cliente=1 por justamente la linea que esta debajo --> cliente=(*usu)->id;
+    // En caso de que no funcionase asi, simplemente se debera asignar a cliente el ID_cliente del cliente que este usando el sistema: "cliente= ID_cliente del sistema"
+    int sumador=1,i,j,fatdoor=0;
+    int *vec;
+
+    //cliente=(*usu)->id; //el id del usuario que esta utilizando esta funcion.
+    vec=dev_existe_cliente(pe,(*usu)->id);
+
+    printf("\nSEGUIMIENTO DE DEVOLUCIONES");
+    printf("\n--------------------------------------------");
+    if(vec[0]!=-1) // me sirve pora comprobar si ese cliente ha hecho algun pedido.
+    {
+        for (i=1; i<=vec[0]; i++) //recorremos pedidos (i)
+        {
+            j=dev_existe_devolucion_seguimiento(dev,vec[i]);
+            if(j!=-1)
+            {
+                printf("\n%i.- Pedido: %i		Estado: %s",sumador,(*dev)[j].id_pedido,(*dev)[j].estado);
+                sumador++;
+                fatdoor=1;
+            }
+        }
+        if(fatdoor == 0)
+        {
+            printf("\nNo ha realizado ninguna devolucion en Esizon.");
+        }
+    }
+    else
+    {
+        printf("\nNo ha realizado ningun pedido en Esizon.");
+    }
+    printf("\n--------------------------------------------\n");
+    system("Pause");
+}
+
+int dev_existe_devolucion_seguimiento(devoluciones **dev,int devol)
+{
+    int i,pos=-1;
+    //printf("DEVOL= %i",devol);
+    devol++;
+    for(i=0; i<ndevoluciones ; i++)
+    {
+        if(devol==(*dev)[i].id_pedido)
+        {
+            pos=i; // en esta pos guardamos la posicion en la estructura del id_pedido de devoluciones
+        }
+    }
+    return pos;
+    //si pos!=-1 esa devolucion existe
+    //si pos==-1 esa devolucion no existe
+}
+
+void dev_enviar(devoluciones **dev,pedidos **pe,usuario **usu,cliente **c)  //(IMPORTANTE)
+{
+    //Se ejecutara despues del seguimiento en el caso de que el cliente lo desee.
+
+    //(LEER) cuando se vaya implementar tener cuidado de cambiar cliente=1 por justamente la linea que esta debajo --> cliente=(*usu)->id;
+    // En caso de que no funcionase asi, simplemente se debera asignar a cliente el ID_cliente del cliente que este usando el sistema: "cliente= ID_cliente del sistema"
+    int sumador=1,p1,p2,p3,op;
+    //cliente=(*usu)->id; //el id del usuario que esta utilizando esta funcion.
+    int s1;
+    int *vec;
+
+
+
+    printf("\n--------------------------------------------");
+    printf("\nIntroduzca el ID Pedido que ha enviado: ");
+    scanf("%i",&s1);
+
+    p1=dev_existe_devolucion(dev,s1); //p1 tiene la posicion del pedido dentro de la estructuras devoluciones
+    p2=dev_aceptado(dev,pe,s1);
+    p3=dev_cliente_pedidos(s1,(*usu)->id,pe); //(IMPORTANTE) sustituir cliente, por el del sistema.
+    if (p1!=-1 && p2==1 && p3==1)
+    {
+        strcpy((*dev)[p1].estado,"enviado");
+        printf("\nSu envio ha quedado registrado en Esizon con exito.");
+    }
+    else
+    {
+        if(strcmp((*dev)[p1].estado,"enviado")==0)
+        {
+            printf("\nEse pedido ya se ha enviado anteriormente.\n");
+        }
+        do
+        {
+            printf("\nLa ID introducida no es valida.");
+            printf("\n1.- Reintentar\n2.- Cerrar\nElija una opcion: ");
+            fflush(stdin);
+            scanf("%i", &op);
+            system("cls");
+        }
+        while(0>op|| op>2);
+
+        if(op == 1)
+        {
+            dev_seguimiento(dev,pe,usu,c);
+            dev_enviar(dev,pe,usu,c);
+        }
+        //menu para salirse
+    }
+
+
+    printf("\n--------------------------------------------");
+    guardar_devoluciones(dev);
+}
+
+int dev_aceptado(devoluciones **dev, pedidos **pe,int id_aux_pedido)
+{
+    int j,exito=0;
+    for (j=0; j<ndevoluciones ; j++)
+    {
+        if(id_aux_pedido==(*dev)[j].id_pedido) //si el ID_pedido pasado como parametro, coincide con el id de un pedido guardado en devoluciones
+        {
+            if( (strcmp((*dev)[j].estado,"aceptado"))==0)// si el estado es recibido, se procede
+            {
+                exito=1;
+            }
+        }
+    }
+    return exito;
+}
+
+int dev_cliente_pedidos(int pedido,int cliente,pedidos **pe)
+{
+    //Devuelve la pos del pedido si el ID_pedido pasado esta guardado y pertenece al cliente.
+    int i,coincide=0;
+    for(i=0; i<nt_pedidos; i++)
+    {
+        if(cliente==(*pe)[i].id_cliente && pedido==(*pe)[i].id_pedido ) //comprobamos que el cliente este en pedidos
+        {
+            coincide=1;
+        }
+
+    }
+
+    return coincide;
+}
+
