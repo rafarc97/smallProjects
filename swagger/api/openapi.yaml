@@ -1,0 +1,290 @@
+openapi: 3.0.0
+info:
+  title: Policies services
+  description: Esta API permite obtener información de las políticas de la compañía
+  termsOfService: https://rafarc97.github.io/
+  contact:
+    name: Rafael
+    url: https://rafarc97.github.io/
+    email: rafaelrodriguezcalvente@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/rafarc97/clients-services/1.0.0
+  description: SwaggerHub API Auto Mocking
+- url: https://virtserver.swaggerhub.com/rafarc97/MyApiRest/1.0.0
+  description: SwaggerHub API
+- url: http://localhost:4000/
+  description: Servidor Local
+paths:
+  /politics:
+    get:
+      description: Permite obtener la lista de todas las políticas
+      operationId: politicsGET
+      parameters:
+      - name: id
+        in: query
+        description: Código de la política
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 64cceef9-3a01-49ae-a23b-3761b604800b
+      - name: amountInsured
+        in: query
+        description: Suma asegurada
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: number
+          format: float
+          example: 1825.89
+      - name: email
+        in: query
+        description: Email de la política
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: inesblankenship@quotezart.com
+      - name: inceptionDate
+        in: query
+        description: Fecha de inicio
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: installmentPayment
+        in: query
+        description: Pago
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          example: true
+      - name: clientId
+        in: query
+        description: Id cliente enlazado
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: e8fd159b-57c4-4d36-9bd7-a59ca13057bb
+      responses:
+        "200":
+          description: Solicitud exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200'
+                x-content-type: application/json
+        "400":
+          description: Error en la petición
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Ha ocurrido un error en la petición."}'
+                x-content-type: application/json
+        "401":
+          description: No estás autorizado
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Error. No estás autorizado."}'
+                x-content-type: application/json
+        "404":
+          description: Página o solicitud no encontrada
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Error. Página o solicitud no encontrada"}'
+                x-content-type: application/json
+      x-swagger-router-controller: Default
+    post:
+      description: Permite añadir políticas en nuestra base de datos
+      operationId: politicsPOST
+      parameters:
+      - name: politics
+        in: query
+        description: Crear una nueva política en la base de datos
+        required: false
+        style: form
+        explode: true
+        schema:
+          $ref: '#/components/schemas/politics'
+      responses:
+        "200":
+          description: Solicitud exitosa
+          content:
+            application/json:
+              schema:
+                type: string
+                example: OK
+                x-content-type: application/json
+      x-swagger-router-controller: Default
+  /politics/{id}:
+    get:
+      description: Obtener información de una política ingresando su ID
+      operationId: politicsIdGET
+      parameters:
+      - name: id
+        in: path
+        description: Código de la política
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: a0ece5db-cd14-4f21-812f-966633e7be86
+      responses:
+        "200":
+          description: Solicitud exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200'
+                x-content-type: application/json
+        "400":
+          description: Error en la petición
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Ha ocurrido un error en la petición."}'
+                x-content-type: application/json
+        "401":
+          description: No estás autorizado
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Error. No estás autorizado."}'
+                x-content-type: application/json
+        "404":
+          description: Página o solicitud no encontrada
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Error. Página o solicitud no encontrada"}'
+                x-content-type: application/json
+      x-swagger-router-controller: Default
+    delete:
+      description: Borra la información de una política ingresando su ID
+      operationId: politicsIdDELETE
+      parameters:
+      - name: id
+        in: path
+        description: Código de la política
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: a0ece5db-cd14-4f21-812f-966633e7be86
+      responses:
+        "200":
+          description: Solicitud exitosa
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Politics <id> deleted."}'
+                x-content-type: application/json
+        "400":
+          description: Error en la petición
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Ha ocurrido un error en la petición."}'
+                x-content-type: application/json
+        "401":
+          description: No estás autorizado
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Error. No estás autorizado."}'
+                x-content-type: application/json
+        "404":
+          description: Página o solicitud no encontrada
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{"message":"Error. Página o solicitud no encontrada"}'
+                x-content-type: application/json
+      x-swagger-router-controller: Default
+components:
+  schemas:
+    inline_response_200:
+      properties:
+        id:
+          type: string
+          example: a0ece5db-cd14-4f21-812f-966633e7be86
+        amountInsured:
+          type: number
+          example: 1825.89
+        email:
+          type: string
+          example: inesblankenship@quotezart.com
+        inceptionDate:
+          type: string
+          format: date
+        installmentPayment:
+          type: boolean
+          example: true
+        clientId:
+          type: string
+          example: e8fd159b-57c4-4d36-9bd7-a59ca13057bb
+      example:
+        clientId: e8fd159b-57c4-4d36-9bd7-a59ca13057bb
+        inceptionDate: 2000-01-23
+        amountInsured: 1825.89
+        id: a0ece5db-cd14-4f21-812f-966633e7be86
+        installmentPayment: true
+        email: inesblankenship@quotezart.com
+    politics:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Código de la política
+          example: a0ece5db-cd14-4f21-812f-966633e7be86
+        amountInsured:
+          type: number
+          description: Suma asegurada
+          example: 1825.89
+        email:
+          type: string
+          description: Email
+          example: inesblankenship@quotezart.com
+        inceptionDate:
+          type: string
+          description: Fecha de inicio
+          format: date
+        installmentPayment:
+          type: boolean
+          description: Pago
+          example: true
+        clientId:
+          type: string
+          description: Id cliente enlazado
+          example: e8fd159b-57c4-4d36-9bd7-a59ca13057bb
